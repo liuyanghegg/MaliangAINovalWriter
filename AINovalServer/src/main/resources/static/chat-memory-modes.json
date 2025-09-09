@@ -1,0 +1,142 @@
+{
+  "chatMemoryModes": [
+    {
+      "code": "history",
+      "displayName": "历史模式",
+      "description": "保留完整的对话历史记录，不进行任何修改或删除",
+      "icon": "📝",
+      "features": [
+        "保留所有消息",
+        "完整的对话上下文",
+        "适合短期对话"
+      ],
+      "limitations": [
+        "可能超出模型上下文限制",
+        "增加API调用成本",
+        "处理速度可能较慢"
+      ],
+      "defaultConfig": {
+        "mode": "history",
+        "preserveSystemMessages": true,
+        "enablePersistence": false
+      }
+    },
+    {
+      "code": "message_window",
+      "displayName": "消息窗口记忆",
+      "description": "保留最近的N条消息，自动淘汰旧消息",
+      "icon": "🔄",
+      "features": [
+        "控制消息数量",
+        "保持对话连贯性",
+        "适合长期对话"
+      ],
+      "limitations": [
+        "可能丢失早期对话信息",
+        "需要合理设置窗口大小"
+      ],
+      "defaultConfig": {
+        "mode": "message_window",
+        "maxMessages": 50,
+        "preserveSystemMessages": true,
+        "enablePersistence": false
+      },
+      "configOptions": [
+        {
+          "key": "maxMessages",
+          "type": "number",
+          "min": 10,
+          "max": 200,
+          "default": 50,
+          "description": "保留的最大消息数量"
+        }
+      ]
+    },
+    {
+      "code": "token_window",
+      "displayName": "令牌窗口记忆",
+      "description": "基于令牌数量保留最近的对话内容",
+      "icon": "🎯",
+      "features": [
+        "精确控制上下文长度",
+        "优化成本效益",
+        "兼容不同模型的限制"
+      ],
+      "limitations": [
+        "需要估算令牌数量",
+        "对中文支持可能不够精确"
+      ],
+      "defaultConfig": {
+        "mode": "token_window",
+        "maxTokens": 4000,
+        "preserveSystemMessages": true,
+        "enablePersistence": false
+      },
+      "configOptions": [
+        {
+          "key": "maxTokens",
+          "type": "number",
+          "min": 1000,
+          "max": 32000,
+          "default": 4000,
+          "description": "保留的最大令牌数量"
+        }
+      ]
+    },
+    {
+      "code": "summary",
+      "displayName": "总结记忆",
+      "description": "对历史消息进行智能总结，保留关键信息",
+      "icon": "📋",
+      "features": [
+        "智能信息压缩",
+        "保留对话要点",
+        "适合超长对话"
+      ],
+      "limitations": [
+        "需要额外的AI调用",
+        "可能丢失细节信息",
+        "总结质量依赖模型能力"
+      ],
+      "defaultConfig": {
+        "mode": "summary",
+        "summaryThreshold": 20,
+        "summaryRetainCount": 5,
+        "preserveSystemMessages": true,
+        "enablePersistence": false
+      },
+      "configOptions": [
+        {
+          "key": "summaryThreshold",
+          "type": "number",
+          "min": 10,
+          "max": 100,
+          "default": 20,
+          "description": "触发总结的消息数量阈值"
+        },
+        {
+          "key": "summaryRetainCount",
+          "type": "number",
+          "min": 3,
+          "max": 20,
+          "default": 5,
+          "description": "总结后保留的最近消息数量"
+        }
+      ]
+    }
+  ],
+  "recommendations": {
+    "shortConversation": "history",
+    "mediumConversation": "message_window", 
+    "longConversation": "token_window",
+    "veryLongConversation": "summary"
+  },
+  "apiEndpoints": {
+    "sendWithMemory": "/api/v1/ai-chat/messages/send-with-memory",
+    "streamWithMemory": "/api/v1/ai-chat/messages/stream-with-memory",
+    "getMemoryHistory": "/api/v1/ai-chat/messages/memory-history",
+    "updateMemoryConfig": "/api/v1/ai-chat/sessions/update-memory-config",
+    "clearMemory": "/api/v1/ai-chat/sessions/clear-memory",
+    "getSupportedModes": "/api/v1/ai-chat/memory/supported-modes"
+  }
+} 

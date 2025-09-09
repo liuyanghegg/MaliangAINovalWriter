@@ -1,0 +1,6 @@
+.qodo
+AINovalServer\target
+.idea
+.vscode
+deploy
+build

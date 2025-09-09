@@ -1,0 +1,142 @@
+server:
+  port: 18080
+  shutdown: graceful
+  netty:
+    connection-timeout: 5s
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on-param
+    include-exception: true
+
+proxy:
+  enabled: true
+  host: 127.0.0.1        # 容器内改为 host.docker.internal 或代理容器名
+  port: 6888             # 若是 socks 监听端口不同，请改为实际端口
+  type: socks            # 关键：切换为 socks
+  applySystemProperties: true
+  applyProxySelector: false
+  trustAllCerts: true   # 排障时可临时 true，生产请 false
+
+spring:
+  application:
+    name: ai-novel-server
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/ainoval?
+      auto-index-creation: true
+      database: ainovel
+      authentication-database: admin
+  webflux:
+    base-path: /
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+logging:
+  level:
+    root: INFO
+    com.ainovel: DEBUG
+    # 添加MongoDB查询日志配置
+    org.springframework.data.mongodb: WARN
+    com.ainovel.server.service.impl.ImportServiceImpl: DEBUG
+    com.ainovel.server.config.MongoQueryCounterAspect: WARN
+    org.springframework.data.mongodb.core.ReactiveMongoTemplate: WARN
+    org.springframework.data.mongodb.core.MongoTemplate: WARN
+    org.springframework.data.mongodb.repository.query: WARN
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.eclipse.angus.mail.smtp: DEBUG
+    reactor.netty: WARN
+    # MongoDB 映射调试日志 - 用于排查 MappingException
+    org.springframework.data.mongodb.core.convert: WARN
+    org.springframework.data.mongodb.core.mapping: WARN
+    org.springframework.data.mapping: WARN
+    org.springframework.data.mapping.model: WARN
+    # MongoDB Java Driver 调试（可选）
+    org.mongodb.driver: WARN
+    # MongoDB Event Listener - 关闭详细的文档内容日志
+    org.springframework.data.mongodb.core.mapping.event.LoggingEventListener: WARN
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,jmx
+    jmx:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    jmx:
+      enabled: true
+  jmx:
+    enabled: true
+  # 更新过时的配置
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+    exporter:
+      otlp:
+        enabled: true
+        endpoint: http://${OTLP_TRACES_HOST:localhost}:${OTLP_TRACES_PORT:11800}
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: dev
+    distribution:
+      percentiles-histogram:
+        "[tasks.execution.time]": true
+        "[http.server.requests]": true
+      percentiles:
+        "[tasks.execution.time]": [0.5, 0.95, 0.99]
+        "[http.server.requests]": [0.5, 0.95, 0.99]
+      slo:
+        "[tasks.execution.time]": [2000ms, 10000ms, 30000ms]
+
+        "[http.server.requests]": [100ms, 300ms, 1s, 3s, 5s]
+
+# 自定义配置
+ainovel:
+  security:
+    jwt:
+      # 为了兼容旧代码读取此键的场景，这里也统一引用同一个环境变量
+      secret-key: ${JWT_SECRET:aiNovelSecretKey12345678901234567890}
+      expiration-time: 86400000  # 24小时，单位毫秒
+      refresh-token-expiration: 604800000  # 7天，单位毫秒
+  performance:
+    virtual-threads:
+      enabled: true
+    monitoring:
+      enabled: true
+    testing:
+      security-disabled: true  # 禁用安全验证，方便测试
+  # 添加MongoDB查询日志配置
+  mongodb:
+    logging:
+      enabled: true
+      query-level: DEBUG
+      result-count: true
+
+# 禁用JWT验证，方便测试
+security:
+  jwt:
+    disabled: false
+
+# 统一 JwtServiceImpl 的读取来源（dev 环境）
+jwt:
+  secret: ${JWT_SECRET:aiNovelSecretKey12345678901234567890}
+  expiration: 86400000
+  refresh-expiration: 604800000
+
+# 显式固定开发环境的 Jasypt 加解密配置，避免被外部环境变量干扰
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:${JASYPT_PASSWORD:MaliangAI_SecretKey_PleaseChangeThis_2025}}
+    algorithm: PBEWITHHMACSHA512ANDAES_256
+    iv-generator-classname: org.jasypt.iv.RandomIvGenerator
