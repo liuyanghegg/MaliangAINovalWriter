@@ -25,6 +25,7 @@ deploy/
 1) 准备环境变量
 - 复制 `deploy/open/production.env.example` 到 `deploy/open/production.env`
 - 根据你的实际情况修改变量（尤其是 Mongo、JWT、对象存储、代理、API Key 等）
+- 将github右边的release下的ainovel.jar包下载，复制到deploy/dist目录下
 
 2) 构建镜像（或使用你私有仓库已推送的镜像）
 ```bash
