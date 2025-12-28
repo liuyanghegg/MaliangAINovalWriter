@@ -31,6 +31,12 @@ EOF
 # Build the application
 RUN mvn clean package -DskipTests -f AINovalServer/pom.xml
 
+# Ensure web directory exists for copying (create empty one if needed)
+RUN mkdir -p /build/deploy/dist/web && \
+    if [ ! "$(ls -A /build/deploy/dist/web 2>/dev/null)" ]; then \
+        echo "<h1>AINoval Server</h1><p>Backend API is running</p>" > /build/deploy/dist/web/index.html; \
+    fi
+
 FROM eclipse-temurin:21-jre
 
 ENV TZ=Asia/Shanghai \
@@ -52,7 +58,7 @@ RUN mkdir -p /app/web
 # Copy built JAR from builder stage
 COPY --from=builder /build/AINovalServer/target/ai-novel-server-*.jar /app/ainoval-server.jar
 
-# Copy web assets from builder stage (if they exist)
+# Copy web assets from builder stage (guaranteed to exist now)
 COPY --from=builder /build/deploy/dist/web/ /app/web/
 
 EXPOSE 18080
