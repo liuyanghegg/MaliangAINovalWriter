@@ -12,9 +12,9 @@ ENV JAVA_TOOL_OPTIONS="--add-opens=java.base/java.math=ALL-UNNAMED --add-opens=j
 
 WORKDIR /app
 
-# Copy prebuilt server jar and web assets (paths are relative to build context: deploy)
-COPY dist/ainoval-server.jar /app/ainoval-server.jar
-COPY dist/web/ /app/web/
+# Copy prebuilt server jar and web assets (paths are relative to build context: project root)
+COPY deploy/dist/ainoval-server.jar /app/ainoval-server.jar
+COPY deploy/dist/web/ /app/web/
 
 EXPOSE 18080
 
