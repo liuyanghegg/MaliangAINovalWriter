@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Node modules (if any)
+node_modules/
+
+# Build artifacts (except the ones we need)
+AINovalServer/target/
+!deploy/dist/
+
+# Documentation
+README.md
+*.md
+
+# Other
+.env
+.env.local
+.env.*.local

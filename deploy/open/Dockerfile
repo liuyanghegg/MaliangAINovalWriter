@@ -5,14 +5,14 @@ ENV TZ=Asia/Shanghai \
     LC_ALL=C.UTF-8 \
     SPRING_PROFILES_ACTIVE=prod \
     JVM_XMS=512m \
-    JVM_XMX=512m
+    JVM_XMX=1024m
 
 # Fix JDK 21 reflective access for BigDecimal in Spring Data Mongo
 ENV JAVA_TOOL_OPTIONS="--add-opens=java.base/java.math=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
 
 WORKDIR /app
 
-# Copy prebuilt server jar and web assets (paths are relative to build context: project root)
+# Copy prebuilt server jar and web assets
 COPY deploy/dist/ainoval-server.jar /app/ainoval-server.jar
 COPY deploy/dist/web/ /app/web/
 
